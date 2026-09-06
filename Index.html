@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PG Management - 3 Blocks</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Toast Notification -->
+        <div id="toast"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <h1>🏠 PG <span>Management</span></h1>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-item">
+                    <div class="number" id="statTotalRooms">87</div>
+                    <div class="label">Total Rooms</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="statOccupiedRooms">0</div>
+                    <div class="label">Occupied Rooms</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="statOccupiedBeds">0</div>
+                    <div class="label">Occupied Beds</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="statVacantBeds">174</div>
+                    <div class="label">Vacant Beds</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="statTotalRent">₹0</div>
+                    <div class="label">Total Rent</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Block Stats -->
+        <div class="block-stats" id="blockStats"></div>
+
+        <!-- Calculator -->
+        <div class="calculator">
+            <h2>⚡ Electricity Bill Calculator</h2>
+            <div class="calc-grid">
+                <div class="calc-group">
+                    <label>Select Block</label>
+                    <select id="blockSelect">
+                        <option value="All">All Blocks</option>
+                        <option value="A">Block A</option>
+                        <option value="B">Block B</option>
+                        <option value="C">Block C</option>
+                    </select>
+                </div>
+                <div class="calc-group">
+                    <label>Total Units Consumed</label>
+                    <input type="number" id="totalUnits" placeholder="Enter units..." />
+                </div>
+                <div class="calc-group">
+                    <label>Per Unit Price (₹)</label>
+                    <input type="number" id="perUnitPrice" value="8" step="0.01" />
+                </div>
+                <div class="calc-group">
+                    <button class="btn btn-primary" onclick="calculateBill()">Calculate Bill</button>
+                </div>
+                <div class="calc-group">
+                    <button class="btn btn-success" onclick="applyBill()">Apply to Rooms</button>
+                </div>
+            </div>
+            <div class="calc-result">
+                <div class="item">
+                    <span class="value" id="totalBillDisplay">₹0</span>
+                    <span class="label">Total Electricity Bill</span>
+                </div>
+                <div class="item">
+                    <span class="value gold" id="perRoomDisplay">₹0</span>
+                    <span class="label">Per Room Share</span>
+                </div>
+                <div class="item">
+                    <span class="value green" id="perBedDisplay">₹0</span>
+                    <span class="label">Per Bed Share</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <select id="filterBlock" onchange="filterRooms()">
+                <option value="all">All Blocks</option>
+                <option value="A">Block A</option>
+                <option value="B">Block B</option>
+                <option value="C">Block C</option>
+            </select>
+            <select id="filterFloor" onchange="filterRooms()">
+                <option value="all">All Floors</option>
+                <option value="Ground">Ground</option>
+                <option value="1st">1st</option>
+                <option value="2nd">2nd</option>
+                <option value="3rd">3rd</option>
+                <option value="4th">4th</option>
+                <option value="5th">5th</option>
+            </select>
+            <select id="filterStatus" onchange="filterRooms()">
+                <option value="all">All Rooms</option>
+                <option value="occupied">Occupied</option>
+                <option value="vacant">Vacant</option>
+            </select>
+            <input type="text" id="searchRoom" placeholder="🔍 Search room..." onkeyup="filterRooms()" />
+            <button class="btn btn-warning" onclick="resetData()">🔄 Reset All Data</button>
+            <button class="btn btn-primary" onclick="refreshData()">🔄 Refresh</button>
+        </div>
+
+        <!-- Room Grid -->
+        <div id="roomGrid" class="room-grid">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading rooms...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3 id="modalTitle">Room Details</h3>
+            <div id="modalBody"></div>
+            <div class="actions">
+                <button class="btn btn-danger" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
