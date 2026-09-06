@@ -3,18 +3,460 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PG Management - 3 Blocks</title>
-    <link rel="stylesheet" href="style.css" />
+    <title>PG Management System - 3 Blocks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f0f4f8;
+            color: #1a202c;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            z-index: 9999;
+            transform: translateX(400px);
+            transition: transform .3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+        }
+        #toast.show {
+            transform: translateX(0);
+        }
+        #toast.success {
+            background: #48bb78;
+        }
+        #toast.error {
+            background: #fc8181;
+        }
+        #toast.info {
+            background: #4299e1;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a237e, #0d1445);
+            color: #fff;
+            padding: 25px 30px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+        }
+        .header h1 span {
+            color: #ffd700;
+        }
+        .header .stats-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .header .stat-item {
+            text-align: center;
+        }
+        .header .stat-item .number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffd700;
+        }
+        .header .stat-item .label {
+            font-size: 11px;
+            opacity: .8;
+        }
+
+        /* Block Stats */
+        .block-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .block-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-left: 5px solid #1a237e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .block-card .block-name {
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .block-card .block-stats-mini {
+            text-align: right;
+            font-size: 13px;
+            color: #4a5568;
+        }
+        .block-card .block-stats-mini .num {
+            font-weight: 700;
+            color: #1a237e;
+        }
+
+        /* Calculator */
+        .calculator {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .calculator h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #1a237e;
+        }
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        .calc-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .calc-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #4a5568;
+        }
+        .calc-group input,
+        .calc-group select {
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #f7fafc;
+            width: 100%;
+        }
+        .calc-group input:focus,
+        .calc-group select:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+        .calc-result {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: center;
+        }
+        .calc-result .item {
+            display: flex;
+            flex-direction: column;
+        }
+        .calc-result .item .value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a237e;
+        }
+        .calc-result .item .value.green {
+            color: #38a169;
+        }
+        .calc-result .item .value.gold {
+            color: #d69e2e;
+        }
+        .calc-result .item .label {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all .3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: #1a237e;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #0d1445;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+        }
+        .btn-success {
+            background: #48bb78;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+        .btn-danger {
+            background: #fc8181;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #f56565;
+            transform: translateY(-2px);
+        }
+        .btn-warning {
+            background: #f6ad55;
+            color: #fff;
+        }
+        .btn-warning:hover {
+            background: #ed8936;
+            transform: translateY(-2px);
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 11px;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+        .filters input,
+        .filters select {
+            padding: 8px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #f7fafc;
+        }
+        .filters input:focus,
+        .filters select:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        /* Room Grid */
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .room-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform .3s, box-shadow .3s;
+            border-left: 5px solid #1a237e;
+        }
+        .room-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        .room-card .room-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .room-card .room-meta {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+        .room-card .bed-info {
+            font-size: 13px;
+            color: #4a5568;
+            margin: 4px 0;
+            padding: 4px 8px;
+            background: #f7fafc;
+            border-radius: 6px;
+        }
+        .room-card .rent-display {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a237e;
+            margin: 8px 0;
+        }
+        .room-card .actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .room-card .bed-status {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .bed-status.occupied {
+            background: #fef3c7;
+            color: #d69e2e;
+        }
+        .bed-status.vacant {
+            background: #c6f6d5;
+            color: #276749;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #1a237e;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #1a237e;
+        }
+        .modal .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .modal .form-group label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        .modal .form-group input {
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .modal .form-group input:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+        .modal .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media(max-width:768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .header .stats-grid {
+                justify-content: center;
+            }
+            .room-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .block-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="container">
         <!-- Toast Notification -->
         <div id="toast"></div>
 
         <!-- Header -->
         <div class="header">
             <h1>🏠 PG <span>Management</span></h1>
-            <div class="stats-grid" id="statsGrid">
+            <div class="stats-grid">
                 <div class="stat-item">
                     <div class="number" id="statTotalRooms">87</div>
                     <div class="label">Total Rooms</div>
@@ -55,7 +497,7 @@
                     </select>
                 </div>
                 <div class="calc-group">
-                    <label>Total Units Consumed</label>
+                    <label>Total Units</label>
                     <input type="number" id="totalUnits" placeholder="Enter units..." />
                 </div>
                 <div class="calc-group">
@@ -72,15 +514,15 @@
             <div class="calc-result">
                 <div class="item">
                     <span class="value" id="totalBillDisplay">₹0</span>
-                    <span class="label">Total Electricity Bill</span>
+                    <span class="label">Total Bill</span>
                 </div>
                 <div class="item">
                     <span class="value gold" id="perRoomDisplay">₹0</span>
-                    <span class="label">Per Room Share</span>
+                    <span class="label">Per Room</span>
                 </div>
                 <div class="item">
                     <span class="value green" id="perBedDisplay">₹0</span>
-                    <span class="label">Per Bed Share</span>
+                    <span class="label">Per Bed</span>
                 </div>
             </div>
         </div>
@@ -108,8 +550,10 @@
                 <option value="vacant">Vacant</option>
             </select>
             <input type="text" id="searchRoom" placeholder="🔍 Search room..." onkeyup="filterRooms()" />
-            <button class="btn btn-warning" onclick="resetData()">🔄 Reset All Data</button>
-            <button class="btn btn-primary" onclick="refreshData()">🔄 Refresh</button>
+            <button class="btn btn-warning" onclick="resetData()">🔄 Reset All</button>
+            <button class="btn btn-primary" onclick="exportData()">📥 Export</button>
+            <button class="btn btn-success" onclick="document.getElementById('importFile').click()">📤 Import</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)" />
         </div>
 
         <!-- Room Grid -->
@@ -132,6 +576,663 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // ─── CONFIGURATION ──────────────────────────────────────────────────────
+        var CONFIG = {
+            totalRooms: 87,
+            bedsPerRoom: 2,
+            defaultRent: 5000,
+            defaultElectricityRate: 8,
+            blocks: {
+                'A': {
+                    name: 'Block A',
+                    floors: {
+                        'Ground': { roomCount: 3, prefix: 'A00' },
+                        '1st': { roomCount: 6, prefix: 'A1' },
+                        '2nd': { roomCount: 6, prefix: 'A2' },
+                        '3rd': { roomCount: 6, prefix: 'A3' },
+                        '4th': { roomCount: 5, prefix: 'A4' },
+                        '5th': { roomCount: 3, prefix: 'A5' }
+                    }
+                },
+                'B': {
+                    name: 'Block B',
+                    floors: {
+                        'Ground': { roomCount: 3, prefix: 'B00' },
+                        '1st': { roomCount: 6, prefix: 'B1' },
+                        '2nd': { roomCount: 6, prefix: 'B2' },
+                        '3rd': { roomCount: 6, prefix: 'B3' },
+                        '4th': { roomCount: 5, prefix: 'B4' },
+                        '5th': { roomCount: 3, prefix: 'B5' }
+                    }
+                },
+                'C': {
+                    name: 'Block C',
+                    floors: {
+                        'Ground': { roomCount: 3, prefix: 'C00' },
+                        '1st': { roomCount: 6, prefix: 'C1' },
+                        '2nd': { roomCount: 6, prefix: 'C2' },
+                        '3rd': { roomCount: 6, prefix: 'C3' },
+                        '4th': { roomCount: 5, prefix: 'C4' },
+                        '5th': { roomCount: 3, prefix: 'C5' }
+                    }
+                }
+            }
+        };
+
+        // ─── STATE ──────────────────────────────────────────────────────────────
+        var roomData = [];
+        var filteredData = [];
+        var blockStats = {};
+        var electricityHistory = [];
+
+        // ─── GENERATE ROOM NUMBERS ─────────────────────────────────────────────
+        function generateRoomNumbers() {
+            var rooms = [];
+            var floorOrder = ['Ground', '1st', '2nd', '3rd', '4th', '5th'];
+
+            for (var block in CONFIG.blocks) {
+                var blockData = CONFIG.blocks[block];
+                var floorNames = Object.keys(blockData.floors);
+                floorNames.sort(function(a, b) {
+                    return floorOrder.indexOf(a) - floorOrder.indexOf(b);
+                });
+
+                for (var f = 0; f < floorNames.length; f++) {
+                    var floor = floorNames[f];
+                    var floorData = blockData.floors[floor];
+                    for (var i = 1; i <= floorData.roomCount; i++) {
+                        var roomNumber = floorData.prefix + (i < 10 ? '0' + i : i);
+                        rooms.push({
+                            block: block,
+                            floor: floor,
+                            roomNumber: roomNumber
+                        });
+                    }
+                }
+            }
+            return rooms;
+        }
+
+        // ─── INITIALIZE DATA ────────────────────────────────────────────────────
+        function initializeData() {
+            var saved = localStorage.getItem('pgRoomData');
+            if (saved) {
+                try {
+                    var parsed = JSON.parse(saved);
+                    if (parsed && parsed.length > 0) {
+                        roomData = parsed;
+                        return;
+                    }
+                } catch (e) {}
+            }
+
+            var roomNumbers = generateRoomNumbers();
+            roomData = [];
+
+            for (var i = 0; i < roomNumbers.length; i++) {
+                var room = roomNumbers[i];
+                for (var bed = 0; bed < CONFIG.bedsPerRoom; bed++) {
+                    var bedId = String.fromCharCode(65 + bed);
+                    roomData.push([
+                        room.block,
+                        room.floor,
+                        room.roomNumber,
+                        room.roomNumber + '-' + bedId,
+                        'No',
+                        '',
+                        0,
+                        0,
+                        0,
+                        'Vacant'
+                    ]);
+                }
+            }
+            saveData();
+        }
+
+        // ─── SAVE / LOAD ──────────────────────────────────────────────────────
+        function saveData() {
+            localStorage.setItem('pgRoomData', JSON.stringify(roomData));
+            localStorage.setItem('pgElectricityHistory', JSON.stringify(electricityHistory));
+        }
+
+        function loadSavedData() {
+            var saved = localStorage.getItem('pgElectricityHistory');
+            if (saved) {
+                try {
+                    electricityHistory = JSON.parse(saved) || [];
+                } catch (e) {}
+            }
+        }
+
+        // ─── TOAST ──────────────────────────────────────────────────────────────
+        function showToast(message, type) {
+            type = type || 'info';
+            var toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = type + ' show';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ─── RENDER ─────────────────────────────────────────────────────────────
+        function renderRooms() {
+            var grid = document.getElementById('roomGrid');
+            var search = document.getElementById('searchRoom').value.toLowerCase();
+            var filterBlock = document.getElementById('filterBlock').value;
+            var filterFloor = document.getElementById('filterFloor').value;
+            var filterStatus = document.getElementById('filterStatus').value;
+
+            filteredData = roomData.filter(function(row) {
+                var block = row[0];
+                var floor = row[1];
+                var roomNo = row[2].toString().toLowerCase();
+                var occupied = row[4] === 'Yes';
+
+                if (filterBlock !== 'all' && block !== filterBlock) return false;
+                if (filterFloor !== 'all' && floor !== filterFloor) return false;
+                if (filterStatus === 'occupied' && !occupied) return false;
+                if (filterStatus === 'vacant' && occupied) return false;
+                if (search && !roomNo.includes(search)) return false;
+                return true;
+            });
+
+            if (filteredData.length === 0) {
+                grid.innerHTML =
+                    '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#718096;">No rooms match the filter</p>';
+                return;
+            }
+
+            var html = '';
+            var currentRoom = null;
+            var roomBeds = [];
+
+            for (var i = 0; i < filteredData.length; i++) {
+                var row = filteredData[i];
+                var roomNo = row[2];
+                if (currentRoom !== roomNo) {
+                    if (currentRoom !== null) {
+                        html += renderRoomCard(currentRoom, roomBeds);
+                    }
+                    currentRoom = roomNo;
+                    roomBeds = [];
+                }
+                roomBeds.push(row);
+            }
+            if (currentRoom !== null) {
+                html += renderRoomCard(currentRoom, roomBeds);
+            }
+            grid.innerHTML = html;
+        }
+
+        function renderRoomCard(roomNo, beds) {
+            var occupiedBeds = beds.filter(function(b) {
+                return b[4] === 'Yes';
+            });
+            var totalRent = 0;
+            for (var i = 0; i < occupiedBeds.length; i++) {
+                totalRent += (occupiedBeds[i][6] || 0);
+            }
+            var electricityShare = beds[0][7] || 0;
+            var block = beds[0][0];
+            var floor = beds[0][1];
+
+            var colorMap = { 'A': '#1a237e', 'B': '#2d3748', 'C': '#553c9a' };
+            var blockColor = colorMap[block] || '#1a237e';
+
+            var html = '<div class="room-card" style="border-left-color: ' + blockColor + '">';
+            html += '<div class="room-number">🏠 ' + roomNo + '</div>';
+            html += '<div class="room-meta">' + block + ' | ' + floor + '</div>';
+            html += '<div class="rent-display">₹' + totalRent.toFixed(0) + '</div>';
+
+            for (var j = 0; j < beds.length; j++) {
+                var bed = beds[j];
+                var bedId = bed[3];
+                var occupied = bed[4] === 'Yes';
+                var occupantName = bed[5] || '';
+                var rent = bed[6] || 0;
+                var bedLabel = bedId.split('-')[1];
+
+                html += '<div class="bed-info">';
+                html += 'Bed ' + bedLabel + ': ';
+                html += '<span class="bed-status ' + (occupied ? 'occupied' : 'vacant') + '">';
+                html += occupied ? '👤 ' + occupantName : '🟢 Vacant';
+                html += '</span> ';
+                html += occupied ? '₹' + rent.toFixed(0) : '';
+                html += '</div>';
+            }
+
+            html += '<div style="font-size:12px;color:#718096;margin:4px 0;">⚡ Share: ₹' + electricityShare.toFixed(0) +
+                '</div>';
+            html += '<div class="actions">';
+            for (var k = 0; k < beds.length; k++) {
+                var bed = beds[k];
+                var bedId = bed[3];
+                var occupied = bed[4] === 'Yes';
+                var bedLabel = bedId.split('-')[1];
+                var btnClass = occupied ? 'btn-danger' : 'btn-success';
+                var btnText = occupied ? 'Vacate' : 'Occupy';
+                html += '<button class="btn ' + btnClass + ' btn-sm" onclick="toggleBed(\'' + roomNo + '\', \'' + bedId +
+                    '\')">';
+                html += btnText + ' Bed ' + bedLabel;
+                html += '</button>';
+            }
+            html += '</div></div>';
+            return html;
+        }
+
+        // ─── STATS ──────────────────────────────────────────────────────────────
+        function updateStats() {
+            var totalBeds = roomData.length;
+            var occupiedBeds = 0;
+            var totalRent = 0;
+            var occupiedRooms = {};
+            var blockStatsTemp = {};
+
+            for (var i = 0; i < roomData.length; i++) {
+                var row = roomData[i];
+                var block = row[0];
+                var roomNo = row[2];
+                var occupied = row[4] === 'Yes';
+                var rent = row[6] || 0;
+
+                if (!blockStatsTemp[block]) {
+                    blockStatsTemp[block] = {
+                        totalRooms: 0,
+                        occupiedRooms: 0,
+                        occupiedBeds: 0,
+                        totalRent: 0
+                    };
+                }
+
+                if (occupied) {
+                    occupiedBeds++;
+                    totalRent += rent;
+                    occupiedRooms[roomNo] = true;
+                    blockStatsTemp[block].occupiedBeds++;
+                    blockStatsTemp[block].totalRent += rent;
+                }
+            }
+
+            var roomNumbers = generateRoomNumbers();
+            for (var j = 0; j < roomNumbers.length; j++) {
+                var room = roomNumbers[j];
+                if (blockStatsTemp[room.block]) {
+                    blockStatsTemp[room.block].totalRooms++;
+                }
+            }
+
+            for (var block in blockStatsTemp) {
+                var occupiedRoomsCount = 0;
+                for (var k = 0; k < roomData.length; k++) {
+                    var row = roomData[k];
+                    if (row[0] === block && row[4] === 'Yes') {
+                        occupiedRoomsCount++;
+                    }
+                }
+                blockStatsTemp[block].occupiedRooms = occupiedRoomsCount / CONFIG.bedsPerRoom;
+            }
+
+            blockStats = blockStatsTemp;
+
+            document.getElementById('statTotalRooms').textContent = CONFIG.totalRooms;
+            document.getElementById('statOccupiedRooms').textContent = Object.keys(occupiedRooms).length;
+            document.getElementById('statOccupiedBeds').textContent = occupiedBeds;
+            document.getElementById('statVacantBeds').textContent = totalBeds - occupiedBeds;
+            document.getElementById('statTotalRent').textContent = '₹' + totalRent;
+
+            updateBlockStats();
+        }
+
+        function updateBlockStats() {
+            var container = document.getElementById('blockStats');
+            var colorMap = { 'A': '#1a237e', 'B': '#2d3748', 'C': '#553c9a' };
+            var html = '';
+
+            for (var block in blockStats) {
+                var stats = blockStats[block];
+                var color = colorMap[block] || '#1a237e';
+                html += '<div class="block-card" style="border-left-color: ' + color + '">';
+                html += '<div><div class="block-name">Block ' + block + '</div>';
+                html += '<div style="font-size:12px;color:#718096;">' + stats.totalRooms + ' rooms</div></div>';
+                html += '<div class="block-stats-mini">';
+                html += '<div>Occupied: <span class="num">' + Math.round(stats.occupiedRooms) + '/' + stats.totalRooms +
+                    '</span></div>';
+                html += '<div>Beds: <span class="num">' + stats.occupiedBeds + '/' + (stats.totalRooms * 2) +
+                    '</span></div>';
+                html += '<div style="color:#1a237e;font-weight:700;">₹' + stats.totalRent + '</div>';
+                html += '</div></div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ─── TOGGLE BED ─────────────────────────────────────────────────────────
+        function toggleBed(roomNo, bedId) {
+            var bed = null;
+            for (var i = 0; i < roomData.length; i++) {
+                if (roomData[i][2] === roomNo && roomData[i][3] === bedId) {
+                    bed = roomData[i];
+                    break;
+                }
+            }
+            if (!bed) return;
+
+            if (bed[4] === 'Yes') {
+                if (!confirm('Vacate bed ' + bedId + '?')) return;
+                updateBed(roomNo, bedId, '', 0);
+            } else {
+                showOccupancyModal(roomNo, bedId);
+            }
+        }
+
+        function updateBed(roomNo, bedId, occupantName, rent) {
+            var found = false;
+
+            for (var i = 0; i < roomData.length; i++) {
+                var row = roomData[i];
+                if (row[2] === roomNo && row[3] === bedId) {
+                    found = true;
+                    if (row[4] === 'Yes') {
+                        row[4] = 'No';
+                        row[5] = '';
+                        row[6] = 0;
+                        row[8] = 0;
+                        row[9] = 'Vacant';
+                    } else {
+                        row[4] = 'Yes';
+                        row[5] = occupantName;
+                        row[6] = rent || CONFIG.defaultRent;
+                        row[8] = (rent || CONFIG.defaultRent) + row[7];
+                        row[9] = 'Occupied';
+                    }
+                    break;
+                }
+            }
+
+            if (!found) {
+                showToast('Bed not found', 'error');
+                return;
+            }
+
+            var roomRows = [];
+            for (var j = 0; j < roomData.length; j++) {
+                if (roomData[j][2] === roomNo) {
+                    roomRows.push(roomData[j]);
+                }
+            }
+
+            var occupiedBeds = [];
+            for (var k = 0; k < roomRows.length; k++) {
+                if (roomRows[k][4] === 'Yes') {
+                    occupiedBeds.push(roomRows[k]);
+                }
+            }
+
+            if (occupiedBeds.length > 0) {
+                var totalRent = occupiedBeds[0][6];
+                var perBedRent = totalRent / occupiedBeds.length;
+
+                for (var m = 0; m < roomRows.length; m++) {
+                    if (roomRows[m][4] === 'Yes') {
+                        roomRows[m][6] = perBedRent;
+                        roomRows[m][8] = perBedRent + roomRows[m][7];
+                    }
+                }
+            }
+
+            saveData();
+            renderRooms();
+            updateStats();
+            showToast('Bed updated successfully', 'success');
+        }
+
+        // ─── OCCUPANCY MODAL ──────────────────────────────────────────────────
+        function showOccupancyModal(roomNo, bedId) {
+            var modal = document.getElementById('modal');
+            var title = document.getElementById('modalTitle');
+            var body = document.getElementById('modalBody');
+
+            title.textContent = 'Room ' + roomNo + ' - Bed ' + bedId;
+            body.innerHTML =
+                '<div class="form-group"><label>👤 Occupant Name</label><input type="text" id="occupantName" placeholder="Enter name..." /></div>' +
+                '<div class="form-group"><label>💰 Rent Amount (₹)</label><input type="number" id="rentAmount" value="' +
+                CONFIG.defaultRent + '" step="100" /></div>' +
+                '<button class="btn btn-success" onclick="confirmOccupancy(\'' + roomNo + '\', \'' + bedId +
+                '\')">✅ Confirm Occupancy</button>';
+
+            modal.classList.add('active');
+            setTimeout(function() {
+                document.getElementById('occupantName').focus();
+            }, 100);
+        }
+
+        function confirmOccupancy(roomNo, bedId) {
+            var name = document.getElementById('occupantName').value.trim();
+            var rent = parseFloat(document.getElementById('rentAmount').value);
+
+            if (!name) {
+                showToast('Please enter name', 'error');
+                return;
+            }
+            if (!rent || rent <= 0) {
+                showToast('Please enter valid rent', 'error');
+                return;
+            }
+
+            updateBed(roomNo, bedId, name, rent);
+            closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ─── CALCULATE BILL ────────────────────────────────────────────────────
+        function calculateBill() {
+            var units = parseFloat(document.getElementById('totalUnits').value);
+            var price = parseFloat(document.getElementById('perUnitPrice').value);
+            var block = document.getElementById('blockSelect').value;
+
+            if (!units || units <= 0) {
+                showToast('Please enter valid units', 'error');
+                return;
+            }
+            if (!price || price <= 0) {
+                showToast('Please enter valid price', 'error');
+                return;
+            }
+
+            var roomsInBlock = CONFIG.totalRooms;
+            if (block !== 'All') {
+                var roomNumbers = generateRoomNumbers();
+                roomsInBlock = 0;
+                for (var i = 0; i < roomNumbers.length; i++) {
+                    if (roomNumbers[i].block === block) roomsInBlock++;
+                }
+            }
+
+            var totalBill = units * price;
+            var perRoomShare = totalBill / roomsInBlock;
+            var perBedShare = perRoomShare / CONFIG.bedsPerRoom;
+
+            document.getElementById('totalBillDisplay').textContent = '₹' + totalBill.toFixed(2);
+            document.getElementById('perRoomDisplay').textContent = '₹' + perRoomShare.toFixed(2);
+            document.getElementById('perBedDisplay').textContent = '₹' + perBedShare.toFixed(2);
+
+            // Store for apply
+            window._billData = {
+                units: units,
+                price: price,
+                block: block,
+                totalBill: totalBill,
+                perRoomShare: perRoomShare,
+                perBedShare: perBedShare,
+                roomsInBlock: roomsInBlock
+            };
+
+            showToast('Bill calculated!', 'success');
+        }
+
+        // ─── APPLY BILL ────────────────────────────────────────────────────────
+        function applyBill() {
+            if (!window._billData) {
+                showToast('Please calculate the bill first', 'error');
+                return;
+            }
+
+            var data = window._billData;
+            if (!confirm('Apply bill to ' + (data.block === 'All' ? 'ALL rooms' : 'Block ' + data.block) + '?')) return;
+
+            for (var i = 0; i < roomData.length; i++) {
+                var row = roomData[i];
+                var roomBlock = row[0];
+                if (data.block !== 'All' && roomBlock !== data.block) continue;
+
+                var occupied = row[4] === 'Yes';
+                var rent = row[6] || 0;
+
+                row[7] = data.perRoomShare;
+                row[8] = occupied ? rent + data.perRoomShare : 0;
+
+                if (occupied) {
+                    var bedRent = rent / CONFIG.bedsPerRoom + data.perBedShare;
+                    row[6] = bedRent * CONFIG.bedsPerRoom;
+                }
+            }
+
+            electricityHistory.push({
+                date: new Date().toLocaleDateString(),
+                block: data.block || 'All',
+                units: data.units,
+                price: data.price,
+                totalBill: data.totalBill,
+                perRoomShare: data.perRoomShare,
+                perBedShare: data.perBedShare
+            });
+
+            saveData();
+            renderRooms();
+            updateStats();
+            showToast('Bill applied successfully!', 'success');
+        }
+
+        // ─── RESET DATA ────────────────────────────────────────────────────────
+        function resetData() {
+            if (!confirm('⚠️ This will reset all room data. Are you sure?')) return;
+
+            for (var i = 0; i < roomData.length; i++) {
+                var row = roomData[i];
+                row[4] = 'No';
+                row[5] = '';
+                row[6] = 0;
+                row[7] = 0;
+                row[8] = 0;
+                row[9] = 'Vacant';
+            }
+            electricityHistory = [];
+            window._billData = null;
+
+            document.getElementById('totalUnits').value = '';
+            document.getElementById('totalBillDisplay').textContent = '₹0';
+            document.getElementById('perRoomDisplay').textContent = '₹0';
+            document.getElementById('perBedDisplay').textContent = '₹0';
+
+            saveData();
+            renderRooms();
+            updateStats();
+            showToast('All data reset successfully!', 'success');
+        }
+
+        // ─── FILTER ────────────────────────────────────────────────────────────
+        function filterRooms() {
+            renderRooms();
+        }
+
+        // ─── REFRESH ───────────────────────────────────────────────────────────
+        function refreshData() {
+            loadSavedData();
+            renderRooms();
+            updateStats();
+            showToast('Refreshed!', 'info');
+        }
+
+        // ─── EXPORT DATA ──────────────────────────────────────────────────────
+        function exportData() {
+            var data = {
+                rooms: roomData,
+                electricity: electricityHistory,
+                exportedAt: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'pg_data_backup_' + new Date().toLocaleDateString() + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast('Data exported successfully!', 'success');
+        }
+
+        // ─── IMPORT DATA ──────────────────────────────────────────────────────
+        function importData(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    var data = JSON.parse(e.target.result);
+                    if (data.rooms && data.rooms.length > 0) {
+                        if (!confirm('This will replace all current data. Continue?')) return;
+                        roomData = data.rooms;
+                        electricityHistory = data.electricity || [];
+                        saveData();
+                        renderRooms();
+                        updateStats();
+                        showToast('Data imported successfully!', 'success');
+                    } else {
+                        showToast('Invalid data format', 'error');
+                    }
+                } catch (err) {
+                    showToast('Error importing data: ' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ─── AUTO CALCULATE ──────────────────────────────────────────────────
+        document.getElementById('totalUnits').addEventListener('input', function() {
+            if (this.value) calculateBill();
+        });
+        document.getElementById('perUnitPrice').addEventListener('input', function() {
+            if (document.getElementById('totalUnits').value) calculateBill();
+        });
+        document.getElementById('blockSelect').addEventListener('change', function() {
+            if (document.getElementById('totalUnits').value) calculateBill();
+        });
+
+        // ─── INIT ──────────────────────────────────────────────────────────────
+        initializeData();
+        loadSavedData();
+        renderRooms();
+        updateStats();
+
+        console.log('🏠 PG Management System loaded!');
+        console.log('📊 Total Rooms:', CONFIG.totalRooms);
+        console.log('🛏️ Total Beds:', CONFIG.totalRooms * CONFIG.bedsPerRoom);
+        console.log('💾 Data saved in localStorage');
+    </script>
 </body>
 </html>
